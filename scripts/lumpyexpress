@@ -490,6 +490,9 @@ else
 	SPL_SAMPLE=`$SAMT view -H $SPL_BAM | grep -m 1 "^@RG" | gawk -v i=$i '{ for (j=1;j<=NF;++j) {if ($j~"^SM:") { gsub("^SM:","",$j); print $j } } }'`
 	LUMPY_SPL_STRING="$LUMPY_SPL_STRING -sr bam_file:${SPL_BAM},back_distance:10,min_mapping_threshold:20,weight:1,id:${SPL_SAMPLE},min_clip:20"
 
+    echo "Split string constructed..."
+    echo "$LUMPY_SPL_STRING"
+
 	# construct LUMPY_DISC_STRING
 	for j in $( seq 0 $(( ${#LIB_RG_LIST[@]}-1 )) )
 	do
@@ -505,11 +508,14 @@ else
 		LUMPY_DISC_STRING="$LUMPY_DISC_STRING -pe bam_file:${DISC_BAM},histo_file:${TEMP_DIR}/$OUTBASE.sample$(($i+1)).lib$(($j+1)).x4.histo,mean:${MEAN},stdev:${STDEV},read_length:${LIB_READ_LENGTH_LIST[$j]},min_non_overlap:${LIB_READ_LENGTH_LIST[$j]},discordant_z:5,back_distance:10,weight:1,id:${DISC_SAMPLE},min_mapping_threshold:20,${RG_STRING}"
 	    fi
 	done
+    echo "Constructed discord string"
+    echo "$LUMPY_DISC_STRING"
     done
 fi
 
 LUMPY_DEPTH_STRING=""
 if [[ ! -z "$DEPTH_BED_LIST" ]]; then
+    echo "Computing depth"
 	# -bedpe bedpe_file:<bedpe file>,id:<sample name>,weight:<sample weight>
 	set -o nounset
 	for j in $( seq 0 $(( ${#DEPTH_BED_LIST[@]}-1 )) )
@@ -521,6 +527,7 @@ if [[ ! -z "$DEPTH_BED_LIST" ]]; then
 		LUMPY_DEPTH_STRING="$LUMPY_DEPTH_STRING -bedpe bedpe_file:$f,id:$sample,weight:4"
 	done
 	set +o nounset
+    echo "Done"
 
 fi
 
